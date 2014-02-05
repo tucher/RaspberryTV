@@ -7,7 +7,7 @@ Rectangle {
         autoPlay: true
         //source: "http://www.nasa.gov/multimedia/nasatv/NTV-Public-IPS.m3u8"
         //source: "sample.mp4"
-        source: "rtmp://tvrain-video.cdn.ngenix.net/secure/_definst_/TVRain_tv.stream?t=1391621900&h=nqnv83RCNxlp2OWPqWR3fw%3D%3D"
+        source: "STREAM_LINK"
     }
 
     VideoOutput {
@@ -20,6 +20,7 @@ Rectangle {
             anchors.fill: parent
             drag.target: parent
             drag.axis: Drag.XAndYAxis
+            onWheel: parent.width += wheel.angleDelta.y
         }
     }
 
@@ -27,10 +28,9 @@ Rectangle {
         text: "FFfuuu!"
         x:0
         y:parent.height/2
-        id: txt
         MouseArea {
             anchors.fill: parent
-            drag.target: txt
+            drag.target: parent
             drag.axis: Drag.XAndYAxis
         }
     }
