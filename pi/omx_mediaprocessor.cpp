@@ -103,10 +103,10 @@ OMX_MediaProcessor::OMX_MediaProcessor(OMX_TextureProviderSh provider) :
    m_incr(0),
    m_hints_audio(new COMXStreamInfo),
    m_hints_video(new COMXStreamInfo),
-   m_audio_fifo_size(0.0f), // zero means use default
-   m_video_fifo_size(0.0f),
-   m_audio_queue_size(0.0f),
-   m_video_queue_size(0.0f),
+   m_audio_fifo_size(0.2f), // zero means use default
+   m_video_fifo_size(0.2f),
+   m_audio_queue_size(0.2f),
+   m_video_queue_size(0.2f),
    m_playspeedCurrent(playspeed_normal),
    m_seekFlush(false),
    m_packetAfterSeek(false),
