@@ -1,0 +1,5 @@
+[
+{"cmd": "play"},
+{"cmd": "pause"},
+{"cmd": "stop"}
+]

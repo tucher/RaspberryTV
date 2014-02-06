@@ -1,9 +1,13 @@
 #include "ctcpserver.h"
 #include <QTcpSocket>
+#include <QFile>
 CTcpServer::CTcpServer(QObject *parent) :
     QTcpServer(parent)
 {
     connect(this, SIGNAL(newConnection()), SLOT(handleConnection()));
+    QFile pFile(":/protocol.json");
+    pFile.open(QIODevice::ReadOnly);
+    m_protocol = QString::fromUtf8(pFile.readAll());
 }
 
 void CTcpServer::setPort(int port)
@@ -25,6 +29,11 @@ bool CTcpServer::connected()
         return true;
     else
         return false;
+}
+
+QString CTcpServer::protocol()
+{
+    return m_protocol;
 }
 
 void CTcpServer::handleConnection()

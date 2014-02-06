@@ -22,3 +22,6 @@ RESOURCES += \
 
 HEADERS += \
     ctcpserver.h
+
+OTHER_FILES += \
+    protocol.json

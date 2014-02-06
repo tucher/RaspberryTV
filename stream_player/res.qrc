@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/stream_player/main.qml</file>
+        <file>protocol.json</file>
     </qresource>
 </RCC>
