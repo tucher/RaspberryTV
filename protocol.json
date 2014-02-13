@@ -1,5 +1,6 @@
 [
 {"cmd": "play"},
 {"cmd": "pause"},
-{"cmd": "stop"}
+{"cmd": "stop"},
+{"cmd": "setUrl", "url":""}
 ]
