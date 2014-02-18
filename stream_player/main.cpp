@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     QtQuick2ApplicationViewer viewer;
 
     qmlRegisterType<CTcpServer>("ru.joof.TcpServer", 1, 0, "TcpServer");
-    viewer.setSource(QUrl( "qrc:/qml/stream_player/main.qml" ));
+    viewer.setSource( QUrl("qrc:/qml/stream_player/main.qml"));
     viewer.showExpanded();
     return app.exec();
 }

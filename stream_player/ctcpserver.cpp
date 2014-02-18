@@ -1,6 +1,60 @@
 #include "ctcpserver.h"
 #include <QTcpSocket>
 #include <QFile>
+#include <QJsonDocument>
+#include <QUrl>
+QByteArray CTcpServer::parseHTML(QByteArray rawData, QVariantMap & postParams)
+{
+    //qDebug() << rawData;
+
+    QString string = QString::fromUtf8(rawData);
+    if(string.indexOf("GET") == 0)
+    {
+        QFile indexHTML("index.html");
+        QByteArray data;
+        if(indexHTML.open(QIODevice::ReadOnly))
+            data = indexHTML.readAll();
+
+        data.prepend("HTTP/1.0 200 Ok\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n");
+        qDebug() << data;
+        return  data;
+    }
+    else if(string.indexOf("POST") == 0)
+    {
+        int i = string.indexOf("Content-Length: ") + 16;
+        QString sContL = string.mid(i, string.indexOf("\n", string.indexOf("Content-Length: ")) - i - 1);
+        bool ok = false;
+        int contentLength = sContL.toInt(&ok);
+        if(ok)
+        {
+            QString content = string.right(contentLength);
+            QVariantMap params;
+            QJsonDocument json = QJsonDocument::fromJson(content.toUtf8());
+            if(!json.isNull())
+            {
+                postParams = json.toVariant().toMap();
+            }
+            else
+            {
+                QStringList pList = content.split("&");
+                foreach(QString p, pList)
+                {
+                    QStringList t = p.split("=");
+                    if(t.count() == 2)
+                    {
+                        params.insert(t[0], QUrl::fromPercentEncoding(t[1].toUtf8()));
+                    }
+                }
+                postParams = params;
+            }
+
+        }
+        return "HTTP/1.0 200 Ok";
+    }
+    else
+        return "HTTP/1.0 400";
+}
+
 CTcpServer::CTcpServer(QObject *parent) :
     QTcpServer(parent)
 {
@@ -25,10 +79,12 @@ void CTcpServer::setPort(int port)
 
 bool CTcpServer::connected()
 {
-    if(m_socket && m_socket->state() == QAbstractSocket::ConnectedState)
-        return true;
-    else
-        return false;
+    foreach(QTcpSocket * s, m_socketList){
+        if(s && s->state() == QAbstractSocket::ConnectedState)
+            return true;
+    }
+
+    return false;
 }
 
 QString CTcpServer::protocol()
@@ -38,34 +94,51 @@ QString CTcpServer::protocol()
 
 void CTcpServer::handleConnection()
 {
-    m_socket = nextPendingConnection();
-    if(m_socket)
+
+    while(hasPendingConnections())
     {
-        connect(m_socket, SIGNAL(readyRead()), SLOT(handleIncomingData()));
-        connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
-        connect(m_socket, SIGNAL(disconnected()), SLOT(handleDisconnected()));
-        connect(m_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), SLOT(socketStateChangedSlot()));
-        emit connectedChanged(true);
+        QTcpSocket * s = nextPendingConnection();
+        if(s)
+        {
+            connect(s, SIGNAL(readyRead()), SLOT(handleIncomingData()));
+            connect(s, SIGNAL(disconnected()), s, SLOT(deleteLater()));
+            connect(s, SIGNAL(disconnected()), SLOT(handleDisconnected()));
+            connect(s, SIGNAL(stateChanged(QAbstractSocket::SocketState)), SLOT(socketStateChangedSlot()));
+            emit connectedChanged(true);
+        }
     }
 }
 
 void CTcpServer::handleIncomingData()
 {
-    emit dataReceived(QString::fromUtf8(m_socket->readAll()));
+    QTcpSocket * s = qobject_cast<QTcpSocket*>(sender());
+    if(!s)
+        return;
+    QByteArray rawData = s->readAll();
+    QVariantMap postParams;
+    QByteArray response = parseHTML(rawData, postParams);
+    qDebug( ) << postParams;
+    if(!postParams.isEmpty())
+    {
+        emit dataReceived(QJsonDocument::fromVariant(postParams).toJson());
+    }
+    s->write(response);
+    s->disconnectFromHost();
 }
 
 void CTcpServer::handleDisconnected()
 {
-    m_socket = 0;
-    emit connectedChanged(false);
+    m_socketList.removeAll(qobject_cast<QTcpSocket*>(sender()));
+    emit connectedChanged(connected());
 }
 
 void CTcpServer::sendData(QString data)
 {
-    if(m_socket)
-        m_socket->write(data.toUtf8());
-    else
-        emit error("not connected");
+    foreach(QTcpSocket *s, m_socketList)
+        if(s)
+            s->write(data.toUtf8());
+    //    else
+    //        emit error("not connected");
 }
 
 void CTcpServer::socketStateChangedSlot()

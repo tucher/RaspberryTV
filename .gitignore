@@ -36,3 +36,13 @@ build/moc_qtquick2applicationviewer.cpp
 build/qml/stream_player/main.qml
 
 build/qrc_res.cpp
+
+build-rpi/qrc_res.cpp
+
+build-rpi/qml/stream_player/main.qml
+
+build-rpi/moc_qtquick2applicationviewer.cpp
+
+build-rpi/moc_ctcpserver.cpp
+
+build-rpi/Makefile

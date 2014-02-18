@@ -21,5 +21,6 @@ if __name__ == '__main__':
     #text_file = open("main.qml", "w")
     #text_file.write(templ)
     #text_file.close()
-    os.environ['LD_LIBRARY_PATH'] = '/opt/libstdc++6.0.19'
-    os.system('./stream_player')
+    print get_streams()
+    #os.environ['LD_LIBRARY_PATH'] = '/opt/libstdc++6.0.19'
+    #os.system('./stream_player')

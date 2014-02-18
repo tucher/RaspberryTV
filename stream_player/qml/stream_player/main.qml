@@ -9,7 +9,7 @@ Rectangle {
 
     property var protocol
     Component.onCompleted: {
-        console.log(server.protocol)
+        //console.log(server.protocol)
         //currentUrl = "http://www.nasa.gov/multimedia/nasatv/NTV-Public-IPS.m3u8"
         currentUrl = "fffuuuuu"
         protocol = JSON.parse(server.protocol)
@@ -23,7 +23,7 @@ Rectangle {
         id: mediaplayer
         autoPlay: false
         source: window.currentUrl
-        onPlaybackStateChanged: console.log(playbackState)
+        //onPlaybackStateChanged: console.log(playbackState)
     }
 
     VideoOutput {
@@ -43,8 +43,8 @@ Rectangle {
     TcpServer {
         id: server
         onDataReceived: {
-            server.sendData("Pong!");
-            console.log("Data from interface: " + data);
+            //server.sendData("Pong!");
+            //console.log("Data from interface: " + data);
             var js ;
             try {
                 js = JSON.parse(data);
@@ -56,8 +56,7 @@ Rectangle {
             processInterfaceCommand(js);
         }
         onError: console.log(error)
-        port: 8886
-        onConnectedChanged: console.log(connected)
+        port: 8080
     }
     Text {
         text: "Interface is not connected"
@@ -119,6 +118,7 @@ Rectangle {
         mediaplayer.source = "fffuuu"
     }
     function setUrl(url) {
-        mediaplayer.source = url
+        mediaplayer.source = url;
+        mediaplayer.play();
     }
 }

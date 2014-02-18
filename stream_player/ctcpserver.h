@@ -9,8 +9,10 @@ class CTcpServer : public QTcpServer
     Q_PROPERTY(int port READ serverPort WRITE setPort NOTIFY portChanged)
     Q_PROPERTY(bool connected READ connected NOTIFY connectedChanged)
     Q_PROPERTY(QString protocol READ protocol NOTIFY protocolChanged)
-    QTcpSocket * m_socket;
+    QList<QTcpSocket *> m_socketList;
     QString m_protocol;
+
+    QByteArray parseHTML(QByteArray rawData, QVariantMap &postParams);
 public:
     explicit CTcpServer(QObject *parent = 0);
     void setPort(int port);
