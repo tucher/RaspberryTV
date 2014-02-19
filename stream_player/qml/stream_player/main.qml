@@ -8,6 +8,7 @@ Rectangle {
     property string currentUrl: ""
 
     property var protocol
+    color: "black"
     Component.onCompleted: {
         //console.log(server.protocol)
         //currentUrl = "http://www.nasa.gov/multimedia/nasatv/NTV-Public-IPS.m3u8"
@@ -27,9 +28,9 @@ Rectangle {
     }
 
     VideoOutput {
-        width:  500
-        height: width*sourceRect.height/sourceRect.width
-
+        //width:  500
+        //height: width*sourceRect.height/sourceRect.width
+        anchors.fill: parent
         source: mediaplayer
 
         MouseArea {
@@ -44,7 +45,7 @@ Rectangle {
         id: server
         onDataReceived: {
             //server.sendData("Pong!");
-            //console.log("Data from interface: " + data);
+            console.log("Data from interface: " + data);
             var js ;
             try {
                 js = JSON.parse(data);
@@ -58,13 +59,13 @@ Rectangle {
         onError: console.log(error)
         port: 8080
     }
-    Text {
-        text: "Interface is not connected"
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
-        color: "red"
-        visible: !server.connected
-    }
+//    Text {
+//        text: "Interface is not connected"
+//        anchors.verticalCenter: parent.verticalCenter
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        color: "red"
+//        visible: !server.connected
+//    }
     Text {
         id: lastCmd
         text: ""

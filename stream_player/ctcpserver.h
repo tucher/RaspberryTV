@@ -30,6 +30,7 @@ public slots:
     void handleDisconnected();
     void sendData(QString data);
     void socketStateChangedSlot();
+    void refreshTVRainLink();
 };
 
 #endif // CTCPSERVER_H

@@ -3,6 +3,8 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QUrl>
+#include <QProcess>
+#include <QTimer>
 QByteArray CTcpServer::parseHTML(QByteArray rawData, QVariantMap & postParams)
 {
     //qDebug() << rawData;
@@ -16,7 +18,7 @@ QByteArray CTcpServer::parseHTML(QByteArray rawData, QVariantMap & postParams)
             data = indexHTML.readAll();
 
         data.prepend("HTTP/1.0 200 Ok\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n");
-        qDebug() << data;
+        //qDebug() << data;
         return  data;
     }
     else if(string.indexOf("POST") == 0)
@@ -28,6 +30,7 @@ QByteArray CTcpServer::parseHTML(QByteArray rawData, QVariantMap & postParams)
         if(ok)
         {
             QString content = string.right(contentLength);
+
             QVariantMap params;
             QJsonDocument json = QJsonDocument::fromJson(content.toUtf8());
             if(!json.isNull())
@@ -49,7 +52,14 @@ QByteArray CTcpServer::parseHTML(QByteArray rawData, QVariantMap & postParams)
             }
 
         }
-        return "HTTP/1.0 200 Ok";
+        QFile indexHTML("index.html");
+        QByteArray data;
+        if(indexHTML.open(QIODevice::ReadOnly))
+            data = indexHTML.readAll();
+
+        data.prepend("HTTP/1.0 200 Ok\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n");
+        //qDebug() << data;
+        return  data;
     }
     else
         return "HTTP/1.0 400";
@@ -62,6 +72,8 @@ CTcpServer::CTcpServer(QObject *parent) :
     QFile pFile(":/protocol.json");
     pFile.open(QIODevice::ReadOnly);
     m_protocol = QString::fromUtf8(pFile.readAll());
+
+    QTimer::singleShot(4000, this, SLOT(refreshTVRainLink()));
 }
 
 void CTcpServer::setPort(int port)
@@ -90,6 +102,18 @@ bool CTcpServer::connected()
 QString CTcpServer::protocol()
 {
     return m_protocol;
+}
+
+void CTcpServer::refreshTVRainLink()
+{
+    QProcess pythonProc;
+    pythonProc.start("python", QStringList() << "get_tvrain_link.py");
+    pythonProc.waitForFinished(10000);
+    QString tvrainLink = QString::fromUtf8(pythonProc.readAllStandardOutput());
+    tvrainLink.remove(tvrainLink.length()-1,1);
+    if(tvrainLink.indexOf("rtmp") == 0)
+        emit dataReceived(QString("{\"cmd\": \"setUrl\", \"url\": \"%1\"}").arg(tvrainLink));
+    qDebug() << "From python: " << tvrainLink;
 }
 
 void CTcpServer::handleConnection()

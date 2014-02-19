@@ -15,3 +15,7 @@ http://raspberry-at-home.com/hotspot-wifi-access-point/
 Basic repo: https://github.com/carlonluca/pi
 Essential changes: remove local path check, remove "return false;" near line 389 in omx_mediaprocessor.cpp
 https://github.com/huceke/omxplayer/issues/160
+
+
+http://ananddrs.com/2013/09/18/rpi-hide-boot-msg/
+http://www.edv-huber.com/index.php/problemloesungen/15-custom-splash-screen-for-raspberry-pi-raspbian
